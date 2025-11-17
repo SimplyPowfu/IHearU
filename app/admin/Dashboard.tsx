@@ -20,6 +20,7 @@ export default function AdminDashboard({ initialData }: { initialData: PendingVi
   const supabase = createClient()
   const router = useRouter()
 
+  // --- AZIONE: APPROVA ---
   const handleApprove = async (id: number) => {
     setLoadingId(id)
     const { error } = await supabase
@@ -27,31 +28,53 @@ export default function AdminDashboard({ initialData }: { initialData: PendingVi
       .update({ is_approved: true })
       .eq('id', id)
 
-    if (error) alert('Errore aggiornamento')
-    else {
+    if (error) {
+      alert('Errore aggiornamento: ' + error.message)
+    } else {
       setVideos(videos.filter(v => v.id !== id))
       router.refresh()
     }
     setLoadingId(null)
   }
 
+  // --- AZIONE: SCARTA E PULISCI SPAZIO ---
   const handleReject = async (id: number, videoPath: string) => {
-    if (!confirm('Sei sicuro di voler eliminare questo video?')) return
+    if (!confirm('Sei sicuro di voler eliminare questo video? Questa azione libererà spazio nello storage.')) return
 
     setLoadingId(id)
-    const { error: dbError } = await supabase
-      .from('contributions')
-      .delete()
-      .eq('id', id)
 
-    if (dbError) {
-      alert('Errore database')
-    } else {
-      await supabase.storage.from('contributi_video').remove([videoPath])
+    try {
+      // 1. CANCELLA IL FILE FISICO (Storage)
+      // È importante farlo PRIMA o INSIEME al database per non perdere il riferimento.
+      const { error: storageError } = await supabase
+        .storage
+        .from('contributi_video')
+        .remove([videoPath])
+
+      if (storageError) {
+        console.error('Errore cancellazione file:', storageError)
+        alert('Attenzione: Il file non è stato cancellato dallo storage. Controlla i permessi.')
+        // Non blocchiamo l'operazione, proviamo comunque a pulire il DB
+      }
+
+      // 2. CANCELLA LA RIGA (Database)
+      const { error: dbError } = await supabase
+        .from('contributions')
+        .delete()
+        .eq('id', id)
+
+      if (dbError) throw dbError
+
+      // 3. Aggiorna la UI
       setVideos(videos.filter(v => v.id !== id))
       router.refresh()
+      console.log('Video eliminato e spazio liberato.')
+
+    } catch (error: any) {
+      alert('Errore durante l\'eliminazione: ' + error.message)
+    } finally {
+      setLoadingId(null)
     }
-    setLoadingId(null)
   }
 
   if (videos.length === 0) {
@@ -62,6 +85,8 @@ export default function AdminDashboard({ initialData }: { initialData: PendingVi
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {videos.map((video) => (
         <div key={video.id} className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg">
+          
+          {/* PLAYER VIDEO */}
           <div className="aspect-video bg-black relative">
             <video 
               src={video.signedUrl} 
@@ -69,6 +94,8 @@ export default function AdminDashboard({ initialData }: { initialData: PendingVi
               className="w-full h-full object-contain"
             />
           </div>
+
+          {/* INFO E CONTROLLI */}
           <div className="p-4">
             <h3 className="text-xl font-bold text-blue-400 mb-1">
               {video.words.text}
@@ -76,6 +103,7 @@ export default function AdminDashboard({ initialData }: { initialData: PendingVi
             <p className="text-xs text-gray-500 mb-4">
               Caricato il: {new Date(video.created_at).toLocaleDateString()}
             </p>
+
             <div className="flex gap-2">
               <button
                 onClick={() => handleApprove(video.id)}
