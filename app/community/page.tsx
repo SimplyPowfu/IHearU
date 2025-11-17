@@ -8,23 +8,24 @@ export default async function CommunityPage() {
   const cookieStore = await cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore as any })
 
-  // 1. SCARICA I PROFILI CON I PUNTEGGI (Video Inviati)
+  // 1. SCARICA SOLO I PROFILI (Ignora la tabella contributions!)
+  // Questo è il trucco: leggiamo il punteggio salvato nel profilo, non contiamo i video vivi.
   const { data: profiles } = await supabase
     .from('profiles')
     .select('username, avatar_url, total_uploads')
-    .gt('total_uploads', 0)
+    .gt('total_uploads', 0) // Mostra chi ha almeno 1 punto
     .order('total_uploads', { ascending: false })
     .limit(10)
 
-  // 2. DATI GENERALI
+  // 2. CALCOLA I TOTALI
+  // Somma i punteggi 'total_uploads' di tutti gli utenti
   const { data: sumData } = await supabase
     .from('profiles')
     .select('total_uploads')
   
-  // Calcolo totale video inviati
   const totalVideosSent = sumData?.reduce((acc, curr) => acc + (curr.total_uploads || 0), 0) || 0;
 
-  // Calcolo totale parole nel dizionario (Segni Imparati)
+  // Conta le parole da imparare
   const { count: totalWordsCount } = await supabase
     .from('words')
     .select('*', { count: 'exact', head: true })
@@ -39,25 +40,20 @@ export default async function CommunityPage() {
           La Hall of Fame
         </h1>
         <p className="text-xl text-gray-300">
-          Classifica basata sui video inviati. Ogni contributo conta!
+          Classifica basata sui video inviati. Ogni contributo resta per sempre nel tuo punteggio!
         </p>
       </div>
 
       {/* STATISTICHE */}
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-        {/* Card 1 */}
         <div className="bg-gray-800 p-8 rounded-2xl text-center border border-gray-700 shadow-lg">
           <div className="text-5xl font-bold text-blue-500 mb-2">{totalVideosSent}</div>
           <div className="text-gray-400 uppercase tracking-wider text-sm">Video Inviati</div>
         </div>
-        
-        {/* Card 2 - MODIFICATA QUI */}
         <div className="bg-gray-800 p-8 rounded-2xl text-center border border-gray-700 shadow-lg">
           <div className="text-5xl font-bold text-purple-500 mb-2">{totalWordsCount || 0}</div>
           <div className="text-gray-400 uppercase tracking-wider text-sm">Segni Imparati</div>
         </div>
-        
-        {/* Card 3 */}
         <div className="bg-gray-800 p-8 rounded-2xl text-center border border-gray-700 shadow-lg">
           <div className="text-5xl font-bold text-green-500 mb-2">{estimatedMinutes}</div>
           <div className="text-gray-400 uppercase tracking-wider text-sm">Minuti di Dati</div>

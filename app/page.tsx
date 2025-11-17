@@ -2,18 +2,22 @@ import Link from 'next/link';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
-// Forza aggiornamento dati (per vedere il numero salire)
+// Forza aggiornamento dati a ogni visita
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  // --- 1. RECUPERA DATI DAL DB ---
   const cookieStore = await cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore as any });
 
-  // Conta TUTTI i contributi inviati (anche non approvati, per mostrare l'attività totale)
-  const { count: totalVideos } = await supabase
-    .from('contributions')
-    .select('*', { count: 'exact', head: true });
+  // --- NUOVA LOGICA DI CONTEGGIO (XP TOTALE) ---
+  // Invece di contare le righe nella tabella video (che possono essere cancellate),
+  // sommiamo i contatori 'total_uploads' di tutti i profili utente.
+  const { data: sumData } = await supabase
+    .from('profiles')
+    .select('total_uploads');
+
+  // Calcola la somma totale (riduce l'array di oggetti a un numero unico)
+  const totalVideosSent = sumData?.reduce((acc, curr) => acc + (curr.total_uploads || 0), 0) || 0;
 
   return (
     <main className="flex flex-col items-center">
@@ -57,7 +61,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* GOAL SECTION (CON COUNTER REALE) */}
+      {/* GOAL SECTION (CON COUNTER IMMORTALE) */}
       <section className="text-center w-full py-24 px-6 bg-gray-900 border-t border-gray-800">
         <h2 className="text-3xl font-bold mb-4">
           Aiutaci a insegnare all'IA
@@ -70,7 +74,7 @@ export default async function HomePage() {
         <Link href="/community" className="group inline-block">
           <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 transition-all transform group-hover:scale-105 group-hover:border-blue-500 group-hover:shadow-[0_0_20px_rgba(37,99,235,0.3)]">
             <div className="text-6xl font-bold text-blue-500 mb-2">
-              {totalVideos || 0}
+              {totalVideosSent} {/* Usa la variabile calcolata dai profili */}
             </div>
             <div className="text-gray-400 uppercase tracking-wider text-sm font-semibold group-hover:text-white">
               Segni Ricevuti
