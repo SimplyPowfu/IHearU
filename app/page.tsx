@@ -1,30 +1,24 @@
-/* Questo è il tuo file: app/page.tsx */
-
 import Link from 'next/link';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
-// -----------------------------------------------------------------
-// Componente "Contatore" (lo creeremo dopo, per ora è finto)
-// -----------------------------------------------------------------
-async function SignCounter() {
-  // In futuro, qui leggeremo i dati da Supabase
-  // per contare i segni approvati.
-  const signCount = 85; // Numero finto per ora
+// Forza aggiornamento dati (per vedere il numero salire)
+export const dynamic = 'force-dynamic';
 
-  return (
-    <div className="text-4xl font-bold text-blue-400">
-      {signCount}
-    </div>
-  );
-}
+export default async function HomePage() {
+  // --- 1. RECUPERA DATI DAL DB ---
+  const cookieStore = await cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore as any });
 
-// -----------------------------------------------------------------
-// La tua HOMEPAGE
-// -----------------------------------------------------------------
-export default function HomePage() {
+  // Conta TUTTI i contributi inviati (anche non approvati, per mostrare l'attività totale)
+  const { count: totalVideos } = await supabase
+    .from('contributions')
+    .select('*', { count: 'exact', head: true });
+
   return (
     <main className="flex flex-col items-center">
       
-      {/* --- 1. HERO SECTION (Il Valore) --- */}
+      {/* HERO SECTION */}
       <section className="text-center w-full py-32 px-6 bg-gray-900">
         <h1 className="text-5xl font-bold mb-4">
           Un Interprete LIS IA, sempre in tasca.
@@ -42,41 +36,51 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* --- 2. DEMO SECTION (Il Prodotto in Azione) --- */}
+      {/* DEMO SECTION */}
       <section className="w-full max-w-5xl py-24 px-6">
         <h2 className="text-3xl font-bold text-center mb-12">
           Come Funziona
         </h2>
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* GIF 1: Da Voce a LIS */}
           <div className="bg-gray-800 rounded-lg p-4">
             <p className="text-center font-semibold mb-2">Da Voce a LIS</p>
-            {/* Qui metterai la tua GIF */}
-            <div className="aspect-video bg-gray-700 rounded text-center leading-[250px]">
+            <div className="aspect-video bg-gray-700 rounded text-center leading-[250px] text-gray-500">
               [GIF: Avatar che segna]
             </div>
           </div>
-          {/* GIF 2: Da LIS a Testo */}
           <div className="bg-gray-800 rounded-lg p-4">
             <p className="text-center font-semibold mb-2">Da LIS a Voce/Testo</p>
-            {/* Qui metterai la tua GIF */}
-            <div className="aspect-video bg-gray-700 rounded text-center leading-[250px]">
+            <div className="aspect-video bg-gray-700 rounded text-center leading-[250px] text-gray-500">
               [GIF: LIS a testo]
             </div>
           </div>
         </div>
       </section>
 
-      {/* --- 3. GOAL SECTION (Il tuo "Counter") --- */}
-      <section className="text-center w-full py-24 px-6 bg-gray-900">
+      {/* GOAL SECTION (CON COUNTER REALE) */}
+      <section className="text-center w-full py-24 px-6 bg-gray-900 border-t border-gray-800">
         <h2 className="text-3xl font-bold mb-4">
           Aiutaci a insegnare all'IA
         </h2>
-        <p className="text-lg text-gray-300 mb-6">
-          Ogni segno che raccogliamo migliora l'interprete.
+        <p className="text-lg text-gray-300 mb-8">
+          Ogni segno che raccogliamo migliora l'interprete per tutti.
         </p>
-        <SignCounter /> {/* Ecco il contatore! */}
-        <p className="text-lg text-gray-400 mt-2">Segni già raccolti</p>
+        
+        {/* IL CONTATORE CLICCABILE */}
+        <Link href="/community" className="group inline-block">
+          <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8 transition-all transform group-hover:scale-105 group-hover:border-blue-500 group-hover:shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+            <div className="text-6xl font-bold text-blue-500 mb-2">
+              {totalVideos || 0}
+            </div>
+            <div className="text-gray-400 uppercase tracking-wider text-sm font-semibold group-hover:text-white">
+              Segni Ricevuti
+            </div>
+            <div className="mt-4 text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+              Guarda la Hall of Fame →
+            </div>
+          </div>
+        </Link>
+
       </section>
 
     </main>

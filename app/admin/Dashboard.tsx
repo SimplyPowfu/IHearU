@@ -1,0 +1,100 @@
+'use client'
+
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+
+type PendingVideo = {
+  id: number
+  video_url: string
+  created_at: string
+  signedUrl: string
+  words: {
+    text: string
+  }
+}
+
+export default function AdminDashboard({ initialData }: { initialData: PendingVideo[] }) {
+  const [videos, setVideos] = useState(initialData)
+  const [loadingId, setLoadingId] = useState<number | null>(null)
+  const supabase = createClient()
+  const router = useRouter()
+
+  const handleApprove = async (id: number) => {
+    setLoadingId(id)
+    const { error } = await supabase
+      .from('contributions')
+      .update({ is_approved: true })
+      .eq('id', id)
+
+    if (error) alert('Errore aggiornamento')
+    else {
+      setVideos(videos.filter(v => v.id !== id))
+      router.refresh()
+    }
+    setLoadingId(null)
+  }
+
+  const handleReject = async (id: number, videoPath: string) => {
+    if (!confirm('Sei sicuro di voler eliminare questo video?')) return
+
+    setLoadingId(id)
+    const { error: dbError } = await supabase
+      .from('contributions')
+      .delete()
+      .eq('id', id)
+
+    if (dbError) {
+      alert('Errore database')
+    } else {
+      await supabase.storage.from('contributi_video').remove([videoPath])
+      setVideos(videos.filter(v => v.id !== id))
+      router.refresh()
+    }
+    setLoadingId(null)
+  }
+
+  if (videos.length === 0) {
+    return <div className="text-center text-gray-400 py-20">Nessun video in attesa di approvazione! 🎉</div>
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {videos.map((video) => (
+        <div key={video.id} className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg">
+          <div className="aspect-video bg-black relative">
+            <video 
+              src={video.signedUrl} 
+              controls 
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="p-4">
+            <h3 className="text-xl font-bold text-blue-400 mb-1">
+              {video.words.text}
+            </h3>
+            <p className="text-xs text-gray-500 mb-4">
+              Caricato il: {new Date(video.created_at).toLocaleDateString()}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleApprove(video.id)}
+                disabled={loadingId === video.id}
+                className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-bold transition-colors disabled:opacity-50"
+              >
+                ✅ Approva
+              </button>
+              <button
+                onClick={() => handleReject(video.id, video.video_url)}
+                disabled={loadingId === video.id}
+                className="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg font-bold transition-colors disabled:opacity-50"
+              >
+                ❌ Scarta
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
