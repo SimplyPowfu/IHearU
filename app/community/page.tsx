@@ -1,122 +1,163 @@
 import { createClient } from '@/lib/supabase/server';
-import Link from 'next/link'
+import Link from 'next/link';
+import { Card } from '@/components/ui/Card'; // Usiamo le card nuove
+import { Trophy, ArrowLeft, Video, BookOpen, Clock } from 'lucide-react';
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
 export default async function CommunityPage() {
   const supabase = await createClient();
 
-  // 1. SCARICA SOLO I PROFILI (Ignora la tabella contributions!)
-  // Questo è il trucco: leggiamo il punteggio salvato nel profilo, non contiamo i video vivi.
+  // SCARICA DATI
   const { data: profiles } = await supabase
     .from('profiles')
     .select('username, avatar_url, total_uploads')
-    .gt('total_uploads', 0) // Mostra chi ha almeno 1 punto
+    .gt('total_uploads', 0)
     .order('total_uploads', { ascending: false })
-    .limit(10)
+    .limit(10);
 
-  // 2. CALCOLA I TOTALI
-  // Somma i punteggi 'total_uploads' di tutti gli utenti
-  const { data: sumData } = await supabase
-    .from('profiles')
-    .select('total_uploads')
-  
+  const { data: sumData } = await supabase.from('profiles').select('total_uploads');
   const totalVideosSent = sumData?.reduce((acc, curr) => acc + (curr.total_uploads || 0), 0) || 0;
 
-  // Conta le parole da imparare
-  const { count: totalWordsCount } = await supabase
-    .from('words')
-    .select('*', { count: 'exact', head: true })
-
+  const { count: totalWordsCount } = await supabase.from('words').select('*', { count: 'exact', head: true });
   const estimatedMinutes = Math.floor((totalVideosSent * 5) / 60);
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white py-20 px-6">
+    <main className="min-h-screen bg-background text-white py-20 px-6 relative overflow-hidden">
       
-      <div className="max-w-4xl mx-auto text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-blue-400">
-          Hall of Fame
-        </h1>
-        <p className="text-xl text-gray-300">
-          Classifica basata sui video inviati. Ogni contributo resta per sempre nel tuo punteggio!
-        </p>
-      </div>
+      {/* SFONDO GIALLO/ORO SOFFUSO */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-neon-yellow/10 rounded-full blur-[150px] pointer-events-none z-0 translate-x-1/3 -translate-y-1/3" />
 
-      {/* STATISTICHE */}
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-        <div className="bg-gray-800 p-8 rounded-2xl text-center border border-gray-700 shadow-lg">
-          <div className="text-5xl font-bold text-blue-500 mb-2">{totalVideosSent}</div>
-          <div className="text-gray-400 uppercase tracking-wider text-sm">Video Inviati</div>
-        </div>
-        <div className="bg-gray-800 p-8 rounded-2xl text-center border border-gray-700 shadow-lg">
-          <div className="text-5xl font-bold text-purple-500 mb-2">{totalWordsCount || 0}</div>
-          <div className="text-gray-400 uppercase tracking-wider text-sm">Segni Imparati</div>
-        </div>
-        <div className="bg-gray-800 p-8 rounded-2xl text-center border border-gray-700 shadow-lg">
-          <div className="text-5xl font-bold text-green-500 mb-2">{estimatedMinutes}</div>
-          <div className="text-gray-400 uppercase tracking-wider text-sm">Minuti di Dati</div>
-        </div>
-      </div>
-
-      {/* CLASSIFICA */}
-      <section className="max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold mb-8 text-center">Top Contributors 🏆</h2>
+      <div className="max-w-5xl mx-auto relative z-10">
         
-        {(!profiles || profiles.length === 0) ? (
-          <div className="text-center text-gray-500 py-12 bg-gray-800/50 rounded-xl border border-gray-700 border-dashed">
-            <p className="mb-4 text-lg">La classifica è ancora vuota.</p>
-            <p className="text-sm">Invia il primo video per apparire qui!</p>
-          </div>
-        ) : (
-          <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-xl">
-            {profiles.map((user, index) => {
-               const initial = (user.username || "A").charAt(0).toUpperCase();
-               const displayName = user.username || "Utente Anonimo";
+        <div className="mb-8">
+          <Link href="/" className="text-gray-400 hover:text-neon-yellow flex items-center gap-2 text-sm font-bold transition-colors w-fit">
+            <ArrowLeft className="w-4 h-4" /> Torna alla Home
+          </Link>
+        </div>
 
-               return (
-                <div 
-                  key={index} 
-                  className={`flex items-center justify-between p-4 border-b border-gray-700 last:border-0 hover:bg-gray-750 transition-colors ${index < 3 ? 'bg-blue-900/10' : ''}`}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className={`font-bold w-8 text-center text-xl ${
-                      index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-orange-400' : 'text-gray-600'
-                    }`}>
-                      {index + 1}
-                    </span>
-                    
-                    {user.avatar_url ? (
-                      <img src={user.avatar_url} alt={displayName} className="w-10 h-10 rounded-full border border-gray-600" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white">
-                        {initial}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 font-display tracking-tight">
+            Hall of <span className="text-neon-yellow drop-shadow-[0_0_20px_rgba(255,195,0,0.5)]">Fame</span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto font-sans">
+            I nostri Top Contributor. Grazie a loro, l'IA sta imparando a comunicare.
+          </p>
+        </div>
+
+        {/* STATISTICHE (Card Gialle/Oro) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+          
+          <Card className="text-center hover:border-neon-yellow/50 border-neon-yellow/10">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-neon-yellow/10 rounded-full text-neon-yellow">
+                <Video className="w-8 h-8" />
+              </div>
+            </div>
+            <div className="text-5xl font-bold text-white mb-2 font-display">{totalVideosSent}</div>
+            <div className="text-sm text-neon-yellow uppercase tracking-widest font-bold">Video Inviati</div>
+          </Card>
+
+          <Card className="text-center hover:border-neon-pink/50 border-neon-pink/10">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-neon-pink/10 rounded-full text-neon-pink">
+                <BookOpen className="w-8 h-8" />
+              </div>
+            </div>
+            <div className="text-5xl font-bold text-white mb-2 font-display">{totalWordsCount || 0}</div>
+            <div className="text-sm text-gray-400 uppercase tracking-widest font-bold">Gesti Imparati</div>
+          </Card>
+
+          <Card className="text-center hover:border-neon-cyan/50 border-neon-cyan/10">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-neon-cyan/10 rounded-full text-neon-cyan">
+                <Clock className="w-8 h-8" />
+              </div>
+            </div>
+            <div className="text-5xl font-bold text-white mb-2 font-display">{estimatedMinutes}</div>
+            <div className="text-sm text-gray-400 uppercase tracking-widest font-bold">Minuti di Dati</div>
+          </Card>
+        </div>
+
+        {/* CLASSIFICA */}
+        <section>
+          <div className="flex items-center gap-3 mb-8">
+            <Trophy className="w-8 h-8 text-neon-yellow" />
+            <h2 className="text-2xl font-bold font-display text-white">Classifica Globale</h2>
+          </div>
+          
+          {(!profiles || profiles.length === 0) ? (
+            <div className="text-center text-gray-500 py-20 bg-surface/50 rounded-2xl border border-white/5 border-dashed">
+              <p className="mb-2 text-lg">La classifica è ancora vuota.</p>
+              <p className="text-sm">Sii il primo a entrare nella storia!</p>
+            </div>
+          ) : (
+            <div className="bg-surface/40 backdrop-blur-md rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+              {profiles.map((user, index) => {
+                 const initial = (user.username || "A").charAt(0).toUpperCase();
+                 const displayName = user.username || "Utente Anonimo";
+                 
+                 // Stili speciali per il podio
+                 let rankStyle = "text-gray-500 font-mono text-lg";
+                 let rowBg = "hover:bg-white/5";
+                 let medal = null;
+
+                 if (index === 0) {
+                   rankStyle = "text-neon-yellow text-3xl drop-shadow-md";
+                   rowBg = "bg-neon-yellow/10 hover:bg-neon-yellow/20 border-b border-neon-yellow/20";
+                   medal = "👑";
+                 } else if (index === 1) {
+                   rankStyle = "text-gray-300 text-2xl";
+                   medal = "🥈";
+                 } else if (index === 2) {
+                   rankStyle = "text-orange-400 text-2xl";
+                   medal = "🥉";
+                 }
+
+                 return (
+                  <div 
+                    key={index} 
+                    className={`flex items-center justify-between p-6 border-b border-white/5 last:border-0 transition-all ${rowBg}`}
+                  >
+                    <div className="flex items-center gap-6">
+                      <span className={`font-bold w-12 text-center ${rankStyle}`}>
+                        {index + 1}
+                      </span>
+                      
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt={displayName} className="w-12 h-12 rounded-full border-2 border-white/10" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-surfaceHighlight to-background border border-white/20 flex items-center justify-center font-bold text-white text-lg">
+                          {initial}
+                        </div>
+                      )}
+                      
+                      <div>
+                        <p className="font-bold text-lg text-white font-display flex items-center gap-2">
+                          @{displayName} {medal && <span className="text-lg">{medal}</span>}
+                        </p>
+                        <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Contributor</p>
                       </div>
-                    )}
+                    </div>
                     
-                    <div>
-                      <p className="font-semibold text-lg text-blue-100">
-                        {displayName}
-                      </p>
+                    <div className="flex flex-col items-end">
+                      <span className="text-2xl font-bold text-neon-cyan font-display">{user.total_uploads}</span>
+                      <span className="text-xs text-gray-500 uppercase tracking-wider">Video</span>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-2 bg-gray-900/50 px-3 py-1 rounded-full border border-gray-700">
-                    <span className="text-blue-400 font-bold">{user.total_uploads}</span>
-                    <span className="text-xs text-gray-400 uppercase">invii</span>
-                  </div>
-                </div>
-               )
-            })}
-          </div>
-        )}
-      </section>
+                 )
+              })}
+            </div>
+          )}
+        </section>
 
-      <div className="text-center mt-16">
-        <Link href="/contribuisci" className="inline-block bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-200 transition-all transform hover:scale-105 shadow-lg">
-          Entra in classifica
-        </Link>
+        <div className="text-center mt-20">
+          <Link href="/contribuisci" className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-background bg-neon-yellow rounded-full hover:bg-yellow-300 transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(255,195,0,0.4)]">
+            Scala la Classifica
+          </Link>
+        </div>
+
       </div>
-
     </main>
   )
 }
