@@ -40,6 +40,7 @@ export default function LoginPage() {
 
         <Auth
           supabaseClient={supabase}
+          redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`}
           appearance={{
             theme: ThemeSupa,
             variables: {

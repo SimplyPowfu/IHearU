@@ -1,13 +1,11 @@
 import Link from 'next/link';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase/server';
 
 // Forza aggiornamento dati a ogni visita
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const cookieStore = await cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore as any });
+  const supabase = await createClient();
 
   // --- NUOVA LOGICA DI CONTEGGIO (XP TOTALE) ---
   // Invece di contare le righe nella tabella video (che possono essere cancellate),

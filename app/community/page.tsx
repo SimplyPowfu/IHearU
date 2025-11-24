@@ -1,12 +1,10 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
 export default async function CommunityPage() {
-  const cookieStore = await cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore as any })
+  const supabase = await createClient();
 
   // 1. SCARICA SOLO I PROFILI (Ignora la tabella contributions!)
   // Questo è il trucco: leggiamo il punteggio salvato nel profilo, non contiamo i video vivi.
@@ -37,7 +35,7 @@ export default async function CommunityPage() {
       
       <div className="max-w-4xl mx-auto text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-bold mb-6 text-blue-400">
-          La Hall of Fame
+          Hall of Fame
         </h1>
         <p className="text-xl text-gray-300">
           Classifica basata sui video inviati. Ogni contributo resta per sempre nel tuo punteggio!

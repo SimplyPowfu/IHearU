@@ -1,11 +1,9 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation'
 import AdminDashboard from './Dashboard'
 
 export default async function AdminPage() {
-  const cookieStore = await cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore as any })
+  const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser()
 
