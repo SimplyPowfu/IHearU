@@ -29,10 +29,6 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // IMPORTANT: Do not run code between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
-
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -41,14 +37,14 @@ export async function updateSession(request: NextRequest) {
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
+    !request.nextUrl.pathname.startsWith('/register') &&
     request.nextUrl.pathname !== '/' &&
     !request.nextUrl.pathname.startsWith('/progetto') &&
     !request.nextUrl.pathname.startsWith('/community')
   ) {
-    // Se l'utente non è loggato e cerca di andare in pagine protette,
-    // reindirizza al login (opzionale, ma utile averlo qui)
-    // Nota: Puoi anche rimuovere questo blocco IF se preferisci gestire 
-    // la protezione dentro le singole pagine come abbiamo fatto finora.
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
   return supabaseResponse
 }

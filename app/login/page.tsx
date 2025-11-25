@@ -112,6 +112,12 @@ export default function LoginPage() {
               }
             }}
           />
+        <p className="text-sm text-gray-400">
+            Non hai ancora un account?{' '}
+            <Link href="/register" className="text-white font-bold hover:text-neon-pink underline decoration-neon-pink/30 underline-offset-4 transition-colors">
+              Crea un account
+            </Link>
+          </p>
         </Card>
         
         <p className="mt-8 text-xs text-gray-500 text-center max-w-xs mx-auto leading-relaxed">
