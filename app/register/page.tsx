@@ -4,39 +4,51 @@ import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Mail } from 'lucide-react' // Importiamo l'icona Mail
 import { Card } from '@/components/ui/Card'
 
 export default function RegisterPage() {
   const supabase = createClient()
   const router = useRouter()
-  
-  // Stato per evitare flash del contenuto mentre controlliamo
   const [isChecking, setIsChecking] = useState(true)
+  
+  // Usiamo un ref per gestire l'intervallo ed evitare memory leak
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const checkSession = async () => {
-      // 1. Controlla se l'utente è già loggato
       const { data: { session } } = await supabase.auth.getSession()
-      
       if (session) {
-        // SE LOGGATO: Non sloggare, ma rimanda alla pagina protetta o home
-        router.replace('/contribuisci') 
+        // Se sei già loggato, via da qui!
+        router.replace('/contribuisci')
       } else {
-        // SE NON LOGGATO: Mostra il form
         setIsChecking(false)
+        
+        // --- INIZIO MAGIC POLLING ---
+        // Se l'utente non è loggato, controlliamo ogni 3 secondi se 
+        // per caso ha confermato la mail in un'altra scheda
+        intervalRef.current = setInterval(async () => {
+          const { data: { session: newSession } } = await supabase.auth.getSession()
+          if (newSession) {
+            // BOOM! Ha confermato la mail. Lo portiamo dentro.
+            if (intervalRef.current) clearInterval(intervalRef.current)
+            router.replace('/contribuisci')
+          }
+        }, 3000)
       }
     }
 
     checkSession()
+
+    // Pulizia quando esci dalla pagina
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
   }, [supabase, router])
 
-  // Se stiamo ancora controllando, mostra un loading vuoto o uno spinner
-  if (isChecking) {
-    return <div className="min-h-screen bg-background" />
-  }
+  if (isChecking) return <div className="min-h-screen bg-background" />
 
   return (
     <main className="min-h-screen bg-background text-white flex flex-col items-center justify-center px-4 py-10 relative overflow-hidden">
@@ -65,7 +77,8 @@ export default function RegisterPage() {
           <Auth
             supabaseClient={supabase}
             view="sign_up"
-            redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`}
+            // Importante: Passiamo il parametro ?next=/contribuisci
+            redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback?next=/contribuisci`}
             showLinks={false}
             appearance={{
               theme: ThemeSupa,
@@ -86,10 +99,8 @@ export default function RegisterPage() {
                 button: 'font-bold mt-2',
                 label: 'text-xs uppercase font-bold tracking-wider mb-1',
                 input: 'focus:border-purple-500 transition-colors',
-                // MESSAGGIO DI ERRORE:
-                // Ora che hai disabilitato la protezione, se l'utente esiste 
-                // apparirà qui in rosso grazie a queste classi.
-                message: 'text-red-400 text-sm text-center mt-4 p-3 bg-red-500/10 rounded-lg border border-red-500/20 font-bold',
+                // Stile per il messaggio di conferma mail
+                message: 'text-green-400 text-sm text-center mt-4 p-4 bg-green-500/10 rounded-xl border border-green-500/20 font-bold animate-pulse',
               }
             }}
             providers={['google']}
@@ -100,6 +111,8 @@ export default function RegisterPage() {
                   email_label: 'Email',
                   password_label: 'Password',
                   button_label: 'Registrati Ora',
+                  // Messaggio personalizzato
+                  confirmation_text: '📧 Controlla la tua posta! Clicca il link per entrare automaticamente.',
                 }
               }
             }}
