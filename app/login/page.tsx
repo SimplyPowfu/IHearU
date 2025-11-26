@@ -4,7 +4,7 @@ import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react' // Aggiungi useState per gestire lo stato di caricamento
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
@@ -12,24 +12,42 @@ import { Card } from '@/components/ui/Card'
 export default function LoginPage() {
   const supabase = createClient()
   const router = useRouter()
+  // Usiamo questo stato per nascondere il form appena avviene il login
+  // Questo evita che l'utente provi a cliccare altro mentre reindirizziamo
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
+    // 1. Controllo Sessione Iniziale (Se arrivo già loggato)
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
+        setIsRedirecting(true) // Nasconde UI
         router.replace('/contribuisci')
       }
     }
     checkSession()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+
+    // 2. Ascolto Evento Login
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        router.refresh() 
-        router.replace('/contribuisci')
+        setIsRedirecting(true) // Feedback visivo immediato (UI sparisce/carica)
+        router.refresh()
+        setTimeout(() => {
+          router.replace('/contribuisci')
+        }, 500) // 500ms sono impercettibili all'occhio ma eterni per la CPU, assicurano il sync
       }
     })
 
     return () => subscription.unsubscribe()
   }, [supabase, router])
+  if (isRedirecting) {
+    return (
+      <main className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
+        <p className="mt-4 text-gray-400 font-sans animate-pulse">Accesso al terminale in corso...</p>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-background text-white flex flex-col items-center justify-center px-4 py-10 relative overflow-hidden">
@@ -120,7 +138,6 @@ export default function LoginPage() {
             }}
           />
 
-          {/* Sezione Link Registrazione (Sistemata graficamente) */}
           <div className="mt-6 pt-6 border-t border-white/10 text-center">
             <p className="text-sm text-gray-400">
               Non hai ancora un account?{' '}
