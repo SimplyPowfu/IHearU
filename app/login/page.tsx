@@ -14,13 +14,20 @@ export default function LoginPage() {
   const router = useRouter()
 
   useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.replace('/contribuisci')
+      }
+    }
+    checkSession()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        // FIX: Usiamo solo replace. Rimuoviamo router.refresh() per evitare il loop "Rendering..."
-        // router.replace è meglio di push qui perché non vogliamo che l'utente torni indietro al login col tasto Back
+        router.refresh() 
         router.replace('/contribuisci')
       }
     })
+
     return () => subscription.unsubscribe()
   }, [supabase, router])
 
@@ -56,7 +63,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <Card className="bg-surface/60 backdrop-blur-xl border-white/10 shadow-2xl">
+        <Card className="bg-surface/60 backdrop-blur-xl border-white/10 shadow-2xl p-6">
           <Auth
             supabaseClient={supabase}
             redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`}
@@ -112,12 +119,16 @@ export default function LoginPage() {
               }
             }}
           />
-        <p className="text-sm text-gray-400">
-            Non hai ancora un account?{' '}
-            <Link href="/register" className="text-white font-bold hover:text-neon-pink underline decoration-neon-pink/30 underline-offset-4 transition-colors">
-              Crea un account
-            </Link>
-          </p>
+
+          {/* Sezione Link Registrazione (Sistemata graficamente) */}
+          <div className="mt-6 pt-6 border-t border-white/10 text-center">
+            <p className="text-sm text-gray-400">
+              Non hai ancora un account?{' '}
+              <Link href="/register" className="text-white font-bold hover:text-neon-pink underline decoration-neon-pink/30 underline-offset-4 transition-colors">
+                Crea un account
+              </Link>
+            </p>
+          </div>
         </Card>
         
         <p className="mt-8 text-xs text-gray-500 text-center max-w-xs mx-auto leading-relaxed">
