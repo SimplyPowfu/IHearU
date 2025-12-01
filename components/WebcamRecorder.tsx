@@ -188,7 +188,7 @@ export default function WebcamRecorder({ onRecordingComplete }: WebcamRecorderPr
             onClick={handleRetry}
             className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-full font-bold transition-all"
           >
-            🔄 Riprova
+            🔄 Registra
           </button>
         )}
 

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { UploadCloud, Video, CheckCircle, FileVideo, ArrowLeft } from 'lucide-react';
+import { UploadCloud, Video, CheckCircle, ArrowLeft, Info, Camera, X, Film, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 const WebcamRecorder = dynamic(
@@ -27,6 +27,48 @@ type Word = {
   text: string;
 };
 
+// --- COMPONENTE ILLUSTRAZIONE ANGOLO ---
+const AngleIllustration = ({ angle, label, color }: { angle: string, label: string, color: string }) => {
+  let rotation = 'rotate-0'; 
+  let position = 'top-1 left-1/2 -translate-x-1/2'; 
+  
+  if (angle === 'left') {
+    rotation = 'rotate-[335deg]'; 
+    position = 'top-1 left-5';
+  } else if (angle === 'right') {
+    rotation = '-rotate-[335deg]';
+    position = 'top-1 right-5';
+  }
+
+  const themeColorClass = color === 'cyan' ? 'text-neon-cyan' : 'text-neon-pink';
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative w-28 h-28 bg-surface rounded-full border border-white/10 flex items-center justify-center shadow-inner overflow-hidden">
+        
+        {/* Utente */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 pt-8">
+          <div className="w-8 h-8 bg-gray-400 rounded-full border-2 border-surface shadow-md relative z-20" />
+          <div className="w-16 h-6 bg-gray-600 rounded-full mt-[-25px] shadow-sm relative z-10" />
+        </div>
+
+        {/* Camera + Cono */}
+        <div className={`absolute ${position} transition-all duration-500 origin-center z-20`}>
+           <div className={`flex flex-col items-center ${rotation}`}>
+              <Camera className={`w-6 h-6 ${themeColorClass} drop-shadow-[0_0_5px_rgba(0,0,0,0.8)] relative z-20 mb-[-5px]`} />
+              <svg width="60" height="80" viewBox="0 0 60 80" className={`opacity-20 ${themeColorClass} fill-current relative z-0`}>
+                <path d="M30 0 L60 65 L0 65 Z" />
+              </svg>
+           </div>
+        </div>
+
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:10px_10px] opacity-50 pointer-events-none" />
+      </div>
+      <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{label}</span>
+    </div>
+  )
+}
+
 export default function ContribuisciPage() {
   const supabase = createClient();
   const router = useRouter();
@@ -37,7 +79,10 @@ export default function ContribuisciPage() {
   
   const [words, setWords] = useState<Word[]>([]);
   const [selectedWordId, setSelectedWordId] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  
+  // MODIFICA: Array di file invece di singolo file
+  const [files, setFiles] = useState<File[]>([]);
+  
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
@@ -57,19 +102,27 @@ export default function ContribuisciPage() {
     initPage();
   }, [supabase, router]);
 
+  // MODIFICA: Aggiunge i file alla lista esistente
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+      const newFiles = Array.from(e.target.files);
+      setFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
+  // MODIFICA: Aggiunge la registrazione alla lista esistente
   const handleWebcamRecording = (recordedFile: File) => {
-    setFile(recordedFile);
+    setFiles((prev) => [...prev, recordedFile]);
+  };
+
+  // NUOVO: Rimuove un singolo file dalla lista
+  const removeFile = (indexToRemove: number) => {
+    setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async () => {
     if (!selectedWordId) return alert('Seleziona una parola!');
-    if (!file) return alert('Manca il video! Caricalo o registralo.');
+    if (files.length === 0) return alert('La lista dei video è vuota! Carica o registra almeno un video.');
     if (!acceptedTerms) return alert('Devi accettare l\'uso dei dati.');
     
     setLoading(true);
@@ -78,32 +131,49 @@ export default function ContribuisciPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Utente non loggato');
 
-      const fileToUpload = file!;
-      const fileExt = fileToUpload.name.split('.').pop() || 'mp4';
-      const fileName = `${user.id}/${Date.now()}_word${selectedWordId}.${fileExt}`;
+      // MODIFICA: Ciclo su tutti i file in coda
+      let uploadedCount = 0;
 
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('contributi_video')
-        .upload(fileName, fileToUpload);
+      for (const fileToUpload of files) {
+        const fileExt = fileToUpload.name.split('.').pop() || 'mp4';
+        // Aggiungiamo un random o index per evitare conflitti se i nomi sono uguali
+        const uniqueId = Math.random().toString(36).substring(7);
+        const fileName = `${user.id}/${Date.now()}_${uniqueId}_word${selectedWordId}.${fileExt}`;
 
-      if (uploadError) throw uploadError;
+        const { error: uploadError, data: uploadData } = await supabase.storage
+          .from('contributi_video')
+          .upload(fileName, fileToUpload);
 
-      const { error: dbError } = await supabase
-        .from('contributions')
-        .insert({
-          user_id: user.id,
-          word_id: parseInt(selectedWordId),
-          video_url: uploadData.path,
-          is_approved: false
-        });
+        if (uploadError) {
+          console.error(`Errore upload file ${fileToUpload.name}:`, uploadError);
+          continue; // Salta questo file ma prova con gli altri
+        }
 
-      if (dbError) throw dbError;
+        const { error: dbError } = await supabase
+          .from('contributions')
+          .insert({
+            user_id: user.id,
+            word_id: parseInt(selectedWordId),
+            video_url: uploadData.path,
+            is_approved: false
+          });
 
-      alert('Video inviato con successo! Grazie.');
-      setFile(null);
-      setSelectedWordId('');
-      setAcceptedTerms(false);
-      router.refresh();
+        if (dbError) {
+           console.error(`Errore DB file ${fileToUpload.name}:`, dbError);
+        } else {
+          uploadedCount++;
+        }
+      }
+
+      if (uploadedCount > 0) {
+        alert(`${uploadedCount} video inviati con successo! Grazie.`);
+        setFiles([]); // Pulisci la coda
+        setSelectedWordId('');
+        setAcceptedTerms(false);
+        router.refresh();
+      } else {
+        throw new Error("Nessun video è stato caricato correttamente.");
+      }
 
     } catch (error: any) {
       console.error('Errore:', error);
@@ -115,7 +185,6 @@ export default function ContribuisciPage() {
 
   if (isCheckingAuth) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
-      {/* SPINNER ROSA */}
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-pink"></div>
     </div>
   );
@@ -123,7 +192,7 @@ export default function ContribuisciPage() {
   return (
     <main className="min-h-screen bg-background text-white py-20 px-6 flex justify-center relative overflow-hidden">
       
-      {/* SFONDO ROSA SOFFUSO */}
+      {/* SFONDO */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-neon-pink/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
       <div className="max-w-2xl w-full relative z-10">
@@ -139,14 +208,76 @@ export default function ContribuisciPage() {
             Insegna un <span className="text-neon-pink drop-shadow-[0_0_15px_rgba(255,42,109,0.5)]">Nuovo Segno</span>
           </h1>
           <p className="text-gray-400 text-lg font-sans">
-            Il tuo contributo è fondamentale. Carica un video o registralo ora.
+            Carica più video contemporaneamente per aiutare l'IA a imparare meglio.
           </p>
         </div>
 
+        {/* --- CARD ISTRUZIONI --- */}
+        <Card className="mb-8 border-neon-cyan/20 bg-neon-cyan/5 backdrop-blur-md overflow-hidden relative">
+          
+          <div className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-neon-cyan/20 rounded-lg text-neon-cyan">
+                <Info className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white font-display">Istruzioni di Registrazione</h3>
+                <p className="text-xs text-gray-400">
+                  Per creare avatar 3D accurati, l'IA ha bisogno di vedere il gesto da più angolazioni, registra 1 video per ogni angolazione.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* 1. SINISTRA */}
+              <div className="bg-black/20 rounded-xl p-4 flex flex-col items-center text-center border border-white/5 hover:border-neon-cyan/30 transition-colors">
+                <div className="mb-4">
+                  <AngleIllustration angle="left" label="~30° SX" color="cyan" />
+                </div>
+                <p className="font-bold text-white text-sm mb-1">Angolo Sinistro</p>
+                <p className="text-xs text-gray-400">
+                  Camera in alto a sinistra.
+                </p>
+              </div>
+
+              {/* 2. FRONTALE (Centrale per importanza) */}
+              <div className="bg-black/20 rounded-xl p-4 flex flex-col items-center text-center border border-neon-cyan/30 bg-neon-cyan/5 shadow-lg transition-colors scale-105 z-10">
+                <div className="mb-4">
+                  <AngleIllustration angle="center" label="Frontale" color="cyan" />
+                </div>
+                <p className="font-bold text-white text-sm mb-1">Frontale</p>
+                <p className="text-xs text-gray-400">
+                  Camera dritta davanti a te.
+                </p>
+              </div>
+
+              {/* 3. DESTRA */}
+              <div className="bg-black/20 rounded-xl p-4 flex flex-col items-center text-center border border-white/5 hover:border-neon-cyan/30 transition-colors">
+                <div className="mb-4">
+                   <AngleIllustration angle="right" label="~30° DX" color="cyan" />
+                </div>
+                <p className="font-bold text-white text-sm mb-1">Angolo Destro</p>
+                <p className="text-xs text-gray-400">
+                  Camera in alto a destra.
+                </p>
+              </div>
+
+            </div>
+            
+            <div className="mt-6 text-center">
+              <span className="text-xs font-mono text-neon-cyan bg-neon-cyan/10 px-3 py-1 rounded-full border border-neon-cyan/20">
+                Suggerimento: Basta ruotare leggermente il busto se la camera è fissa.
+              </span>
+            </div>
+          </div>
+        </Card>
+
+        {/* --- FORM DI UPLOAD --- */}
         <Card className="border-white/10 bg-surface/60 backdrop-blur-xl hover:border-neon-pink/30 transition-colors">
           <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
             
-            {/* 1. SELEZIONE (Focus Rosa) */}
+            {/* 1. SELEZIONE */}
             <div className="space-y-3">
               <label className="block text-sm font-bold text-gray-300 uppercase tracking-wider">
                 1. Quale parola vuoi registrare?
@@ -170,11 +301,11 @@ export default function ContribuisciPage() {
               </div>
             </div>
 
-            {/* 2. TABS (Accento Rosa) */}
+            {/* 2. TABS */}
             <div className="bg-background/50 p-1 rounded-xl flex border border-white/10">
               <button
                 type="button"
-                onClick={() => { setActiveTab('upload'); setFile(null); }}
+                onClick={() => setActiveTab('upload')}
                 className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                   activeTab === 'upload' 
                     ? 'bg-surfaceHighlight text-neon-pink shadow-lg border border-neon-pink/20' 
@@ -186,7 +317,7 @@ export default function ContribuisciPage() {
               </button>
               <button
                 type="button"
-                onClick={() => { setActiveTab('webcam'); setFile(null); }}
+                onClick={() => setActiveTab('webcam')}
                 className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                   activeTab === 'webcam' 
                     ? 'bg-surfaceHighlight text-neon-pink shadow-lg border border-neon-pink/20' 
@@ -198,15 +329,17 @@ export default function ContribuisciPage() {
               </button>
             </div>
 
-            {/* 3. AREA DROP (Hover Rosa) */}
+            {/* 3. AREA DROP / WEBCAM */}
             <div className="min-h-[300px] bg-black/20 rounded-2xl border border-white/5 p-4 flex flex-col justify-center relative overflow-hidden">
               
               {activeTab === 'upload' ? (
                 <div className="animate-fade-in h-full">
                   <div className="relative h-64 border-2 border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-center hover:border-neon-pink/50 hover:bg-neon-pink/5 transition-all cursor-pointer group">
+                    {/* MODIFICA: attributo multiple aggiunto */}
                     <input 
                       type="file" 
                       accept="video/*" 
+                      multiple
                       onChange={handleFileChange} 
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                     />
@@ -214,26 +347,64 @@ export default function ContribuisciPage() {
                       <UploadCloud className="w-8 h-8 text-gray-400 group-hover:text-neon-pink transition-colors" />
                     </div>
                     <p className="text-gray-300 font-medium group-hover:text-white">
-                      {file ? file.name : 'Clicca o trascina il video qui'}
+                      Clicca o trascina uno o più video qui
                     </p>
-                    <p className="text-xs text-gray-500 mt-2">MP4, MOV, WEBM (Max 50MB)</p>
+                    <p className="text-xs text-gray-500 mt-2">MP4, MOV, WEBM (Puoi caricarne più di uno)</p>
                   </div>
                 </div>
               ) : (
                 <div className="animate-fade-in w-full">
                   <WebcamRecorder onRecordingComplete={handleWebcamRecording} />
-                </div>
-              )}
-
-              {file && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-green-500/20 text-green-400 px-4 py-2 rounded-full border border-green-500/50 animate-pulse-slow backdrop-blur-md">
-                  <CheckCircle className="w-4 h-4" />
-                  <span className="text-xs font-bold uppercase tracking-wide">Video Pronto</span>
+                  <p className="text-center text-xs text-gray-400 mt-2">
+                    Ogni volta che termini una registrazione, il video viene aggiunto alla coda in basso.
+                  </p>
                 </div>
               )}
             </div>
 
-            {/* 4. CHECKBOX (Accento Rosa) */}
+            {/* NUOVO: LISTA CODA VIDEO */}
+            {files.length > 0 && (
+              <div className="bg-surface/40 rounded-xl p-4 border border-white/10 animate-fade-in">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                    Coda di Invio ({files.length})
+                  </h4>
+                  <button 
+                    type="button"
+                    onClick={() => setFiles([])} 
+                    className="text-xs text-red-400 hover:text-red-300 hover:underline flex items-center gap-1"
+                  >
+                    <Trash2 className="w-3 h-3" /> Svuota tutto
+                  </button>
+                </div>
+                
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
+                  {files.map((f, index) => (
+                    <div key={index} className="flex items-center justify-between bg-black/20 p-3 rounded-lg border border-white/5 group hover:border-white/20 transition-all">
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="w-8 h-8 rounded bg-surfaceHighlight flex items-center justify-center shrink-0">
+                          <Film className="w-4 h-4 text-neon-pink" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-200 truncate">{f.name}</p>
+                          <p className="text-[10px] text-gray-500">{(f.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeFile(index)}
+                        className="p-2 hover:bg-white/10 rounded-full text-gray-500 hover:text-red-400 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 4. CHECKBOX */}
             <div className="bg-surfaceHighlight/50 p-4 rounded-xl border border-white/5 flex gap-4 items-start group hover:border-neon-pink/30 transition-colors">
               <div className="pt-1">
                 <input 
@@ -250,16 +421,16 @@ export default function ContribuisciPage() {
               </div>
             </div>
 
-            {/* 5. SUBMIT (Bottone Rosa) */}
+            {/* 5. SUBMIT */}
             <div className="pt-2">
               <Button 
                 variant="neon-pink" 
                 size="lg" 
                 type="submit" 
-                disabled={loading}
-                className="w-full shadow-lg shadow-neon-pink/20"
+                disabled={loading || files.length === 0}
+                className="w-full shadow-lg shadow-neon-pink/20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Caricamento...' : 'Invia Contributo'}
+                {loading ? 'Caricamento in corso...' : `Invia ${files.length > 0 ? files.length + ' ' : ''}Contributi`}
               </Button>
             </div>
 
