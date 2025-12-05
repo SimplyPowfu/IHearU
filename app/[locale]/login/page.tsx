@@ -3,25 +3,27 @@
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react' // Aggiungi useState per gestire lo stato di caricamento
-import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 
+// I18N IMPORTS
+import { Link, useRouter } from '@/i18n/routing' // Usa il router e link localizzati
+import { useTranslations } from 'next-intl' // Hook per client components
+
 export default function LoginPage() {
+  const t = useTranslations('Auth'); // Inizializza le traduzioni
   const supabase = createClient()
-  const router = useRouter()
-  // Usiamo questo stato per nascondere il form appena avviene il login
-  // Questo evita che l'utente provi a cliccare altro mentre reindirizziamo
+  const router = useRouter() // Questo router gestisce automaticamente i locali (es. /en/contribuisci)
+  
   const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
-    // 1. Controllo Sessione Iniziale (Se arrivo già loggato)
+    // 1. Controllo Sessione Iniziale
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        setIsRedirecting(true) // Nasconde UI
+        setIsRedirecting(true)
         router.replace('/contribuisci')
       }
     }
@@ -30,21 +32,22 @@ export default function LoginPage() {
     // 2. Ascolto Evento Login
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        setIsRedirecting(true) // Feedback visivo immediato (UI sparisce/carica)
+        setIsRedirecting(true)
         router.refresh()
         setTimeout(() => {
           router.replace('/contribuisci')
-        }, 500) // 500ms sono impercettibili all'occhio ma eterni per la CPU, assicurano il sync
+        }, 500)
       }
     })
 
     return () => subscription.unsubscribe()
   }, [supabase, router])
+
   if (isRedirecting) {
     return (
       <main className="min-h-screen bg-background flex flex-col items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-cyan"></div>
-        <p className="mt-4 text-gray-400 font-sans animate-pulse">Accesso al terminale in corso...</p>
+        <p className="mt-4 text-gray-400 font-sans animate-pulse">{t('loading')}</p>
       </main>
     )
   }
@@ -62,7 +65,7 @@ export default function LoginPage() {
       <div className="absolute top-8 left-4 md:left-8 z-20">
         <Link href="/" className="text-gray-400 hover:text-neon-cyan flex items-center gap-2 text-sm font-bold transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
-          Torna alla Home
+          {t('back_home')}
         </Link>
       </div>
 
@@ -74,16 +77,17 @@ export default function LoginPage() {
             <span className="font-display font-bold text-2xl text-background">I</span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2 font-display">
-            Benvenuto nel <span className="text-neon-cyan">Futuro</span>
+            {t('welcome_title')} <span className="text-neon-cyan">{t('welcome_highlight')}</span>
           </h1>
           <p className="text-gray-400 text-sm font-sans">
-            Accedi al terminale per contribuire al dataset.
+            {t('welcome_desc')}
           </p>
         </div>
 
         <Card className="bg-surface/60 backdrop-blur-xl border-white/10 shadow-2xl p-6">
           <Auth
             supabaseClient={supabase}
+            // Manteniamo window.location.origin, il middleware gestirà il redirect se necessario
             redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`}
             showLinks={false} 
             appearance={{
@@ -122,34 +126,33 @@ export default function LoginPage() {
             }}
             providers={['google']}
             theme="dark"
+            // INIEZIONE TRADUZIONI IN SUPABASE
             localization={{
               variables: {
                 sign_in: {
-                  email_label: 'Email',
-                  password_label: 'Password',
-                  button_label: 'Accedi al Sistema',
+                  email_label: t('supabase.email_label'),
+                  password_label: t('supabase.password_label'),
+                  button_label: t('supabase.button_label'),
+                  loading_button_label: t('supabase.loading_button_label'),
+                  social_provider_text: t('supabase.social_provider_text'),
                 },
-                sign_up: {
-                  email_label: 'Email',
-                  password_label: 'Crea Password',
-                  button_label: 'Registra Account',
-                }
+                // Se usi anche la registrazione diretta, puoi mappare anche sign_up qui sotto
               }
             }}
           />
 
           <div className="mt-6 pt-6 border-t border-white/10 text-center">
             <p className="text-sm text-gray-400">
-              Non hai ancora un account?{' '}
+              {t('no_account')}{' '}
               <Link href="/register" className="text-white font-bold hover:text-neon-pink underline decoration-neon-pink/30 underline-offset-4 transition-colors">
-                Crea un account
+                {t('create_account')}
               </Link>
             </p>
           </div>
         </Card>
         
         <p className="mt-8 text-xs text-gray-500 text-center max-w-xs mx-auto leading-relaxed">
-          L'accesso comporta l'accettazione della nostra <span className="text-gray-300 hover:text-neon-pink cursor-pointer transition-colors">Data Policy</span>.
+          {t('policy_text')} <span className="text-gray-300 hover:text-neon-pink cursor-pointer transition-colors">{t('policy_link')}</span>.
         </p>
 
       </div>

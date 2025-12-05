@@ -3,15 +3,18 @@
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
-import Link from 'next/link'
-import { ArrowLeft, Mail } from 'lucide-react' // Importiamo l'icona Mail
+import { ArrowLeft } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 
+// I18N IMPORTS
+import { Link, useRouter } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
+
 export default function RegisterPage() {
+  const t = useTranslations('Auth'); // Hook traduzioni
   const supabase = createClient()
-  const router = useRouter()
+  const router = useRouter() // Router localizzato
   const [isChecking, setIsChecking] = useState(true)
   
   // Usiamo un ref per gestire l'intervallo ed evitare memory leak
@@ -27,8 +30,6 @@ export default function RegisterPage() {
         setIsChecking(false)
         
         // --- INIZIO MAGIC POLLING ---
-        // Se l'utente non è loggato, controlliamo ogni 3 secondi se 
-        // per caso ha confermato la mail in un'altra scheda
         intervalRef.current = setInterval(async () => {
           const { data: { session: newSession } } = await supabase.auth.getSession()
           if (newSession) {
@@ -59,8 +60,8 @@ export default function RegisterPage() {
       </div>
 
       <div className="absolute top-8 left-4 md:left-8 z-20">
-        <Link href="/" className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Home
+        <Link href="/" className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold transition-colors group">
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> {t('back_home')}
         </Link>
       </div>
 
@@ -68,16 +69,16 @@ export default function RegisterPage() {
         
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold font-display text-white">
-            Registrati
+            {t('register_title')}
           </h1>
-          <p className="text-gray-400 text-sm">Crea un account per contribuire</p>
+          <p className="text-gray-400 text-sm">{t('register_subtitle')}</p>
         </div>
 
         <Card className="bg-surface/60 backdrop-blur-xl border-white/10 shadow-2xl p-6">
           <Auth
             supabaseClient={supabase}
             view="sign_up"
-            // Importante: Passiamo il parametro ?next=/contribuisci
+            // Il callback gestirà il redirect base, il middleware aggiusterà la lingua se necessario
             redirectTo={`${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback?next=/contribuisci`}
             showLinks={false}
             appearance={{
@@ -108,11 +109,11 @@ export default function RegisterPage() {
             localization={{
               variables: {
                 sign_up: {
-                  email_label: 'Email',
-                  password_label: 'Password',
-                  button_label: 'Registrati Ora',
-                  // Messaggio personalizzato
-                  confirmation_text: '📧 Controlla la tua posta! Clicca il link per entrare automaticamente.',
+                  email_label: t('supabase.email_label'), // Riutilizziamo la chiave del login
+                  password_label: t('supabase.password_label'), // Riutilizziamo la chiave del login
+                  button_label: t('supabase.register_button_label'),
+                  confirmation_text: t('supabase.confirmation_text'),
+                  social_provider_text: t('supabase.social_provider_text'),
                 }
               }
             }}
@@ -121,7 +122,7 @@ export default function RegisterPage() {
         
         <div className="mt-6 text-center">
            <Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">
-             Hai già un account? <span className="text-neon-cyan font-bold">Accedi</span>
+             {t('have_account')} <span className="text-neon-cyan font-bold">{t('login_link')}</span>
            </Link>
         </div>
 

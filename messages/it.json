@@ -1,0 +1,172 @@
+{
+  "Home": {
+    "hero": {
+      "badge": "Crowdsourcing Attivo: Unisciti alla rivoluzione",
+      "title_prefix": "Dare voce al ",
+      "title_highlight": "silenzio.",
+      "subtitle": "Costruiamo insieme il primo traduttore universale LIS ↔ Voce.\nUn'Intelligenza Artificiale addestrata dalle persone, per le persone.",
+      "cta_contribute": "Insegna un Segno",
+      "cta_tech": "Scopri la Tecnologia"
+    },
+    "stats": {
+      "collected_signs": "Segni Raccolti",
+      "learned_gestures": "Gesti Imparati",
+      "hall_of_fame": "Hall of Fame",
+      "view_ranking": "Vedi Classifica"
+    },
+    "how_it_works": {
+      "title": "Come Funziona",
+      "subtitle": "Un ciclo virtuoso tra uomo e macchina per abbattere le barriere linguistiche.",
+      "step1_title": "1. Registra",
+      "step1_desc": "Usa la webcam o carica un video. Il nostro sistema estrae i punti chiave delle mani proteggendo la tua privacy.",
+      "step2_title": "2. Addestra",
+      "step2_desc": "I dati anonimizzati vengono usati per insegnare alla rete neurale a riconoscere i movimenti complessi della LIS.",
+      "step3_title": "3. Traduci",
+      "step3_desc": "L'IA diventa capace di tradurre in tempo reale da video a voce e viceversa tramite Avatar 3D."
+    }
+  },
+  "Auth": {
+    "loading": "Accesso al terminale in corso...",
+    "back_home": "Torna alla Home",
+    "welcome_title": "Benvenuto nel ",
+    "welcome_highlight": "Futuro",
+    "welcome_desc": "Accedi al terminale per contribuire al dataset.",
+    "no_account": "Non hai ancora un account?",
+    "create_account": "Crea un account",
+    "policy_text": "L'accesso comporta l'accettazione della nostra ",
+    "policy_link": "Data Policy",
+    "register_title": "Registrati",
+    "register_subtitle": "Crea un account per contribuire",
+    "have_account": "Hai già un account?",
+    "login_link": "Accedi",
+    "supabase": {
+      "email_label": "Email",
+      "password_label": "Password",
+      "button_label": "Accedi al Sistema",
+      "loading_button_label": "Accesso in corso...",
+      "social_provider_text": "Accedi con Google",
+      "register_button_label": "Registrati Ora",
+      "confirmation_text": "📧 Controlla la tua posta! Clicca il link per entrare automaticamente."
+      
+    }
+  },
+  "Contribute": {
+    "header": {
+      "back_home": "Torna alla Home",
+      "title": "Insegna un ",
+      "title_highlight": "Nuovo Segno",
+      "subtitle": "Carica più video contemporaneamente per aiutare l'IA a imparare meglio."
+    },
+    "instructions": {
+      "title": "Istruzioni di Registrazione",
+      "desc": "Per creare avatar 3D accurati, l'IA ha bisogno di vedere il gesto da più angolazioni, registra 1 video per ogni angolazione.",
+      "angles": {
+        "left_label": "~30° SX",
+        "left_title": "Angolo Sinistro",
+        "left_desc": "Camera in alto a sinistra.",
+        "center_label": "Frontale",
+        "center_title": "Frontale",
+        "center_desc": "Camera dritta davanti a te.",
+        "right_label": "~30° DX",
+        "right_title": "Angolo Destro",
+        "right_desc": "Camera in alto a destra."
+      },
+      "hint": "Suggerimento: Basta ruotare leggermente il busto se la camera è fissa."
+    },
+    "form": {
+      "select_label": "1. Quale parola vuoi registrare?",
+      "select_placeholder": "-- Seleziona una parola dal dizionario --",
+      "tabs": {
+        "upload": "Carica File",
+        "webcam": "Registra Ora"
+      },
+      "dropzone": {
+        "title": "Clicca o trascina uno o più video qui",
+        "subtitle": "MP4, MOV, WEBM (Puoi caricarne più di uno)"
+      },
+      "webcam_note": "Ogni volta che termini una registrazione, il video viene aggiunto alla coda in basso.",
+      "webcam_loading": "Inizializzazione Modulo Ottico..."
+    },
+    "queue": {
+      "title": "Coda di Invio",
+      "clear_all": "Svuota tutto"
+    },
+    "terms": {
+      "label": "Autorizzazione Dati",
+      "text_part1": "Confermando, autorizzi l'analisi tramite algoritmi per l'estrazione dei ",
+      "text_highlight": "landmark biometrici",
+      "text_part2": "."
+    },
+    "submit": {
+      "loading": "Caricamento in corso...",
+      "button": "Invia {{count}} Contributi",
+      "button_single": "Invia Contributo"
+    },
+    "alerts": {
+      "select_word": "Seleziona una parola!",
+      "empty_queue": "La lista dei video è vuota! Carica o registra almeno un video.",
+      "accept_terms": "Devi accettare l'uso dei dati.",
+      "login_error": "Utente non loggato",
+      "success": "{{count}} video inviati con successo! Grazie.",
+      "upload_error": "Nessun video è stato caricato correttamente.",
+      "generic_error": "Errore: "
+    }
+  },
+  "Community": {
+    "back_home": "Torna alla Home",
+    "title_prefix": "Hall of ",
+    "title_highlight": "Fame",
+    "subtitle": "I nostri Top Contributor. Grazie a loro, l'IA sta imparando a comunicare.",
+    "stats": {
+      "videos_sent": "Video Inviati",
+      "learned_gestures": "Gesti Imparati",
+      "data_minutes": "Minuti di Dati"
+    },
+    "ranking": {
+      "title": "Classifica Globale",
+      "empty_title": "La classifica è ancora vuota.",
+      "empty_desc": "Sii il primo a entrare nella storia!",
+      "anonymous": "Utente Anonimo",
+      "role_label": "Contributor",
+      "video_label": "Video"
+    },
+    "cta": "Scala la Classifica"
+  },
+  "Project": {
+    "back_home": "Torna alla Home",
+    "header": {
+      "badge": "Architettura neurale",
+      "title_prefix": "Tecnologia ",
+      "title_highlight": "Invisibile",
+      "subtitle": "Non usiamo semplici video. Trasformiamo il movimento umano in dati matematici puri per addestrare un'intelligenza artificiale senza precedenti."
+    },
+    "core": {
+      "title": "Computer Vision & Landmark",
+      "description": "Al cuore del sistema c'è un motore avanzato che traccia <bold>punti chiave per ogni mano</bold> e la struttura facciale.<br><br>Quando carichi un video, noi non guardiamo la tua immagine. L'algoritmo estrae solo le coordinate (X, Y, Z) delle articolazioni. È questo scheletro digitale che l'IA impara a leggere.",
+      "list": {
+        "privacy": "Privacy by Design (Dati anonimizzati alla fonte)",
+        "precision": "Precisione millimetrica del tracking",
+        "light": "Indipendente dalle condizioni di luce"
+      }
+    },
+    "grid": {
+      "data_problem": {
+        "title": "Il Problema dei Dati",
+        "desc": "Le IA imparano dagli esempi. Per l'inglese esistono miliardi di testi, per la LIS i dataset erano scarsi e frammentati. Dovevamo crearne uno nuovo."
+      },
+      "crowdsourcing": {
+        "title": "Crowdsourcing",
+        "desc": "Abbiamo capito che non potevamo farlo da soli. Questa piattaforma trasforma ogni utente in un \"insegnante\" per la macchina."
+      },
+      "training": {
+        "title": "Training Loop",
+        "desc": "Ogni video validato entra nel ciclo di addestramento, migliorando la capacità di riconoscimento del modello."
+      }
+    },
+    "cta": {
+      "title": "Fai parte del progresso",
+      "desc": "Non serve essere esperti di tecnologia. Basta conoscere un segno e condividerlo.",
+      "button": "Contribuisci al Dataset"
+    }
+  }
+}

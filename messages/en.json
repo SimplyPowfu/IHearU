@@ -1,0 +1,171 @@
+{
+  "Home": {
+    "hero": {
+      "badge": "Active Crowdsourcing: Join the revolution",
+      "title_prefix": "Giving a voice to ",
+      "title_highlight": "silence.",
+      "subtitle": "Building the first universal Sign Language ↔ Voice translator together.\nAn Artificial Intelligence trained by people, for people.",
+      "cta_contribute": "Teach a Sign",
+      "cta_tech": "Discover Technology"
+    },
+    "stats": {
+      "collected_signs": "Collected Signs",
+      "learned_gestures": "Learned Gestures",
+      "hall_of_fame": "Hall of Fame",
+      "view_ranking": "View Ranking"
+    },
+    "how_it_works": {
+      "title": "How It Works",
+      "subtitle": "A virtuous cycle between human and machine to break down language barriers.",
+      "step1_title": "1. Record",
+      "step1_desc": "Use your webcam or upload a video. Our system extracts key hand points while protecting your privacy.",
+      "step2_title": "2. Train",
+      "step2_desc": "Anonymized data is used to teach the neural network to recognize complex Sign Language movements.",
+      "step3_title": "3. Translate",
+      "step3_desc": "AI becomes capable of translating in real-time from video to voice and vice versa using 3D Avatars."
+    }
+  },
+  "Auth": {
+    "loading": "Accessing terminal...",
+    "back_home": "Back to Home",
+    "welcome_title": "Welcome to the ",
+    "welcome_highlight": "Future",
+    "welcome_desc": "Access the terminal to contribute to the dataset.",
+    "no_account": "Don't have an account yet?",
+    "create_account": "Create an account",
+    "policy_text": "Access implies acceptance of our ",
+    "policy_link": "Data Policy",
+    "register_title": "Sign Up",
+    "register_subtitle": "Create an account to contribute",
+    "have_account": "Already have an account?",
+    "login_link": "Sign In",
+    "supabase": {
+      "email_label": "Email",
+      "password_label": "Password",
+      "button_label": "Access System",
+      "loading_button_label": "Accessing...",
+      "social_provider_text": "Sign in with Google",
+      "register_button_label": "Sign Up Now",
+      "confirmation_text": "📧 Check your email! Click the link to enter automatically."
+    }
+  },
+  "Contribute": {
+    "header": {
+      "back_home": "Back to Home",
+      "title": "Teach a ",
+      "title_highlight": "New Sign",
+      "subtitle": "Upload multiple videos at once to help AI learn better."
+    },
+    "instructions": {
+      "title": "Recording Instructions",
+      "desc": "To create accurate 3D avatars, AI needs to see the gesture from multiple angles. Record 1 video per angle.",
+      "angles": {
+        "left_label": "~30° LFT",
+        "left_title": "Left Angle",
+        "left_desc": "Camera top-left.",
+        "center_label": "Frontal",
+        "center_title": "Frontal",
+        "center_desc": "Camera straight ahead.",
+        "right_label": "~30° RGT",
+        "right_title": "Right Angle",
+        "right_desc": "Camera top-right."
+      },
+      "hint": "Tip: Just rotate your torso slightly if the camera is fixed."
+    },
+    "form": {
+      "select_label": "1. Which word do you want to record?",
+      "select_placeholder": "-- Select a word from the dictionary --",
+      "tabs": {
+        "upload": "Upload File",
+        "webcam": "Record Now"
+      },
+      "dropzone": {
+        "title": "Click or drag one or more videos here",
+        "subtitle": "MP4, MOV, WEBM (You can upload multiple)"
+      },
+      "webcam_note": "Every time you finish a recording, the video is added to the queue below.",
+      "webcam_loading": "Initializing Optical Module..."
+    },
+    "queue": {
+      "title": "Upload Queue",
+      "clear_all": "Clear all"
+    },
+    "terms": {
+      "label": "Data Authorization",
+      "text_part1": "By confirming, you authorize analysis via algorithms for extracting ",
+      "text_highlight": "biometric landmarks",
+      "text_part2": "."
+    },
+    "submit": {
+      "loading": "Uploading...",
+      "button": "Send {{count}} Contributions",
+      "button_single": "Send Contribution"
+    },
+    "alerts": {
+      "select_word": "Select a word!",
+      "empty_queue": "The video list is empty! Upload or record at least one video.",
+      "accept_terms": "You must accept data usage.",
+      "login_error": "User not logged in",
+      "success": "{{count}} videos sent successfully! Thank you.",
+      "upload_error": "No videos were uploaded correctly.",
+      "generic_error": "Error: "
+    }
+  },
+  "Community": {
+    "back_home": "Back to Home",
+    "title_prefix": "Hall of ",
+    "title_highlight": "Fame",
+    "subtitle": "Our Top Contributors. Thanks to them, AI is learning to communicate.",
+    "stats": {
+      "videos_sent": "Videos Sent",
+      "learned_gestures": "Learned Gestures",
+      "data_minutes": "Minutes of Data"
+    },
+    "ranking": {
+      "title": "Global Ranking",
+      "empty_title": "The ranking is still empty.",
+      "empty_desc": "Be the first to make history!",
+      "anonymous": "Anonymous User",
+      "role_label": "Contributor",
+      "video_label": "Videos"
+    },
+    "cta": "Climb the Ranking"
+  },
+  "Project": {
+    "back_home": "Back to Home",
+    "header": {
+      "badge": "Neural Architecture",
+      "title_prefix": "Invisible ",
+      "title_highlight": "Technology",
+      "subtitle": "We don't use simple videos. We transform human movement into pure mathematical data to train an unprecedented artificial intelligence."
+    },
+    "core": {
+      "title": "Computer Vision & Landmarks",
+      "description": "At the heart of the system is an advanced engine that tracks <bold>key points for each hand</bold> and facial structure.<br><br>When you upload a video, we don't look at your image. The algorithm only extracts the (X, Y, Z) coordinates of the joints. It is this digital skeleton that the AI learns to read.",
+      "list": {
+        "privacy": "Privacy by Design (Data anonymized at source)",
+        "precision": "Millimeter tracking precision",
+        "light": "Independent of lighting conditions"
+      }
+    },
+    "grid": {
+      "data_problem": {
+        "title": "The Data Problem",
+        "desc": "AI learns from examples. For English there are billions of texts, for Sign Language datasets were scarce and fragmented. We had to create a new one."
+      },
+      "crowdsourcing": {
+        "title": "Crowdsourcing",
+        "desc": "We realized we couldn't do it alone. This platform turns every user into a \"teacher\" for the machine."
+      },
+      "training": {
+        "title": "Training Loop",
+        "desc": "Every validated video enters the training loop, improving the model's recognition capability."
+      }
+    },
+    "cta": {
+      "title": "Be part of progress",
+      "desc": "You don't need to be a tech expert. Just knowing a sign and sharing it is enough.",
+      "button": "Contribute to Dataset"
+    }
+  }
+}
