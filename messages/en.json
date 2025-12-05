@@ -141,7 +141,7 @@
     },
     "core": {
       "title": "Computer Vision & Landmarks",
-      "description": "At the heart of the system is an advanced engine that tracks <bold>key points for each hand</bold> and facial structure.<br><br>When you upload a video, we don't look at your image. The algorithm only extracts the (X, Y, Z) coordinates of the joints. It is this digital skeleton that the AI learns to read.",
+      "description": "At the heart of the system is an advanced engine that tracks <bold>key points for each hand</bold> and facial structure. <p>When you upload a video, we don't look at your image. The algorithm only extracts the (X, Y, Z) coordinates of the joints. It is this digital skeleton that the AI learns to read.</p>",
       "list": {
         "privacy": "Privacy by Design (Data anonymized at source)",
         "precision": "Millimeter tracking precision",

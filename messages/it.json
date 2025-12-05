@@ -142,7 +142,7 @@
     },
     "core": {
       "title": "Computer Vision & Landmark",
-      "description": "Al cuore del sistema c'è un motore avanzato che traccia <bold>punti chiave per ogni mano</bold> e la struttura facciale.<br><br>Quando carichi un video, noi non guardiamo la tua immagine. L'algoritmo estrae solo le coordinate (X, Y, Z) delle articolazioni. È questo scheletro digitale che l'IA impara a leggere.",
+      "description": "Al cuore del sistema c'è un motore avanzato che traccia <bold>punti chiave per ogni mano</bold> e la struttura facciale. <p>Quando carichi un video, noi non guardiamo la tua immagine. L'algoritmo estrae solo le coordinate (X, Y, Z) delle articolazioni. È questo scheletro digitale che l'IA impara a leggere.</p>",
       "list": {
         "privacy": "Privacy by Design (Dati anonimizzati alla fonte)",
         "precision": "Precisione millimetrica del tracking",

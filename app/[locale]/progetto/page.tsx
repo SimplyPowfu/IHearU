@@ -56,12 +56,13 @@ export default async function ProgettoPage() {
               <div>
                 <h2 className="text-3xl font-bold mb-4 font-display text-white">{t('core.title')}</h2>
                 <p className="text-gray-300 mb-6 leading-relaxed">
-                  {/* RICH TEXT RENDERING */}
-                  {t.rich('core.description', {
-                    bold: (chunks) => <strong className="text-neon-cyan">{chunks}</strong>,
-                    br: () => <><br/><br/></>
-                  })}
-                </p>
+                {/* RICH TEXT RENDERING */}
+                {t.rich('core.description', {
+                  bold: (chunks) => <strong className="text-neon-cyan">{chunks}</strong>,
+                  // Quando trovi <p>...</p>, inserisci due <br> prima del contenuto
+                  p: (chunks) => <><br/><br/>{chunks}</>
+                })}
+              </p>
                 <ul className="space-y-3 text-gray-400">
                   <li className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-neon-cyan rounded-full shadow-[0_0_10px_#05D9E8]"></div>
