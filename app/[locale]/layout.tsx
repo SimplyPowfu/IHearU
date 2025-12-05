@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { Outfit, Inter } from "next/font/google";
-import "../globals.css"; // ATTENZIONE: Controlla che il percorso ai css sia corretto salendo di due livelli
+import "../globals.css"; // Risaliamo di due livelli per trovare globals.css
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import AuthButton from "@/components/AuthButton";
-import LanguageSwitcher from "@/components/LanguageSwitcher"; // Il nuovo componente
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // i18n imports
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { Link } from '@/i18n/routing'; // USA QUESTO LINK, NON QUELLO DI NEXT!
+import { Link } from '@/i18n/routing'; // Usiamo il Link localizzato
 
 // Font Configuration
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -19,17 +19,34 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "IHearU - The AI Sign Language Interpreter",
   description: "La prima piattaforma open-source per tradurre la Lingua dei Segni Italiana (LIS).",
-  // ... altri metadata
+  keywords: ["AI", "LIS", "Accessibilità", "Startup", "Computer Vision", "Machine Learning"],
+  authors: [{ name: "Tuo Nome" }],
+  openGraph: {
+    title: "IHearU - Dare voce al silenzio",
+    description: "Contribuisci ad addestrare l'IA che abbatterà le barriere della comunicazione.",
+    url: "https://ihearu.vercel.app",
+    siteName: "IHearU Project",
+    locale: "it_IT",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "IHearU - AI Sign Language",
+    description: "Contribuisci al futuro dell'accessibilità.",
+  },
+};
+
+// DEFINIZIONE TIPO CORRETTA PER NEXT.JS 15/16
+type Props = {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>; // <--- ECCO LA MODIFICA FONDAMENTALE (Promise)
 };
 
 export default async function LocaleLayout({
   children,
   params
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
-  // 1. Gestione Parametri Lingua (Await necessario in Next 15/16)
+}: Props) {
+  // 1. AWAIT DEI PARAMETRI (Obbligatorio in Next.js 16)
   const { locale } = await params;
   
   // Validazione lingua
