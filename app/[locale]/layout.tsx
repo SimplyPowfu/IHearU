@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, Inter } from "next/font/google";
-import "../globals.css"; // Risaliamo di due livelli per trovare globals.css
+import "../globals.css";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import AuthButton from "@/components/AuthButton";
@@ -10,7 +10,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { Link } from '@/i18n/routing'; // Usiamo il Link localizzato
+import { Link } from '@/i18n/routing';
 
 // Font Configuration
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -36,28 +36,22 @@ export const metadata: Metadata = {
   },
 };
 
-// DEFINIZIONE TIPO CORRETTA PER NEXT.JS 15/16
 type Props = {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>; // <--- ECCO LA MODIFICA FONDAMENTALE (Promise)
+  params: Promise<{ locale: string }>;
 };
 
 export default async function LocaleLayout({
   children,
   params
 }: Props) {
-  // 1. AWAIT DEI PARAMETRI (Obbligatorio in Next.js 16)
   const { locale } = await params;
   
-  // Validazione lingua
   if (!['it', 'en'].includes(locale)) {
     notFound();
   }
 
-  // 2. Caricamento Messaggi Traduzione
   const messages = await getMessages();
-
-  // 3. Setup Supabase
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -68,7 +62,6 @@ export default async function LocaleLayout({
         outfit.variable,
         inter.variable
       )}>
-        {/* PROVIDER DELLE TRADUZIONI */}
         <NextIntlClientProvider messages={messages}>
         
           {/* --- SFONDO LIQUIDO --- */}
@@ -83,18 +76,26 @@ export default async function LocaleLayout({
           <nav className="w-full fixed top-0 z-50 border-b border-white/5 bg-background/70 backdrop-blur-md">
             <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
               
-              {/* LOGO (Usa il Link localizzato) */}
-              <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-8 h-8 rounded bg-gradient-to-br from-neon-pink to-neon-cyan flex items-center justify-center text-background font-bold font-display text-lg shadow-[0_0_15px_rgba(255,42,109,0.5)]">
-                  I
-                </div>
-                <span className="text-xl font-bold font-display tracking-wide group-hover:text-neon-cyan transition-colors">
-                  IHearU
-                </span>
-              </Link>
+              {/* SINISTRA: LOGO + LANGUAGE SWITCHER */}
+              <div className="flex items-center gap-6">
+                {/* LOGO */}
+                <Link href="/" className="flex items-center gap-2 group">
+                  <div className="w-8 h-8 rounded bg-gradient-to-br from-neon-pink to-neon-cyan flex items-center justify-center text-background font-bold font-display text-lg shadow-[0_0_15px_rgba(255,42,109,0.5)]">
+                    I
+                  </div>
+                  <span className="text-xl font-bold font-display tracking-wide group-hover:text-neon-cyan transition-colors">
+                    IHearU
+                  </span>
+                </Link>
 
-              {/* MENU DESKTOP */}
-              <div className="hidden md:flex gap-8 text-sm font-medium text-gray-300 font-sans">
+                {/* SWITCH LINGUA (SPOSTATO QUI) */}
+                <div className="hidden sm:block"> {/* Opzionale: hidden su mobile piccolissimi se serve spazio */}
+                  <LanguageSwitcher />
+                </div>
+              </div>
+
+              {/* CENTRO: MENU DESKTOP */}
+              <div className="hidden md:flex gap-8 text-sm font-medium text-gray-300 font-sans absolute left-1/2 transform -translate-x-1/2">
                 <Link href="/progetto" className="hover:text-neon-cyan hover:drop-shadow-[0_0_5px_rgba(5,217,232,0.8)] transition-all">
                   Mission
                 </Link>
@@ -103,11 +104,8 @@ export default async function LocaleLayout({
                 </Link>
               </div>
 
-              {/* AZIONI */}
+              {/* DESTRA: AZIONI (Contribuisci + Auth) */}
               <div className="flex items-center gap-4">
-                {/* Switch Lingua */}
-                <LanguageSwitcher />
-
                 <Link 
                   href="/contribuisci" 
                   className="hidden md:block text-sm font-bold font-display text-neon-pink border border-neon-pink/30 px-4 py-2 rounded-full hover:bg-neon-pink/10 hover:border-neon-pink transition-all shadow-[0_0_10px_rgba(255,42,109,0.1)] hover:shadow-[0_0_20px_rgba(255,42,109,0.3)]"
@@ -128,7 +126,7 @@ export default async function LocaleLayout({
 
           {/* FOOTER */}
           <footer className="w-full py-10 text-center text-gray-500 text-sm border-t border-white/5 bg-background/80 backdrop-blur-sm relative z-10">
-            <p>&copy; {new Date().getFullYear()} IHearU. Costruito con l'IA, per l'IA.</p>
+            <p>&copy; {new Date().getFullYear()} IHearU. Costruito con l'IA, per il mondo.</p>
           </footer>
 
         </NextIntlClientProvider>
