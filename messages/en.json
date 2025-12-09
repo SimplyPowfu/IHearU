@@ -2,9 +2,9 @@
   "Home": {
     "hero": {
       "badge": "Active Crowdsourcing: Join the revolution",
-      "title_prefix": "Giving a voice to ",
+      "title_prefix": "Giving a voice to the ",
       "title_highlight": "silence.",
-      "subtitle": "Building the first universal Sign Language ↔ Voice translator together.\nAn Artificial Intelligence trained by people, for people.",
+      "subtitle": "Building the first universal LIS ↔ Voice translator.\nAn Artificial Intelligence trained by people, for people.",
       "cta_contribute": "Teach a Sign",
       "cta_tech": "Discover Technology"
     },
@@ -18,7 +18,7 @@
       "title": "How It Works",
       "subtitle": "A virtuous cycle between human and machine to break down language barriers.",
       "step1_title": "1. Record",
-      "step1_desc": "Use your webcam or upload a video. Our system extracts key hand points while protecting your privacy.",
+      "step1_desc": "Use your webcam or upload a video. Our system will extract key hand points while protecting your privacy.",
       "step2_title": "2. Train",
       "step2_desc": "Anonymized data is used to teach the neural network to recognize complex Sign Language movements.",
       "step3_title": "3. Translate",
@@ -28,7 +28,8 @@
   "Navbar": {
     "mission": "Mission",
     "community": "Community",
-    "contribute": "Contribute"
+    "contribute": "Contribute",
+	"footer": "© 2025 IHearU. Builded with the IA, for the world."
   },
   "Auth": {
     "login": "Login",
