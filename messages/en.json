@@ -25,7 +25,13 @@
       "step3_desc": "AI becomes capable of translating in real-time from video to voice and vice versa using 3D Avatars."
     }
   },
+  "Navbar": {
+    "mission": "Mission",
+    "community": "Community",
+    "contribute": "Contribute"
+  },
   "Auth": {
+    "login": "Login",
     "loading": "Accessing terminal...",
     "back_home": "Back to Home",
     "welcome_title": "Welcome to the ",

@@ -25,7 +25,13 @@
       "step3_desc": "L'IA diventa capace di tradurre in tempo reale da video a voce e viceversa tramite Avatar 3D."
     }
   },
+  "Navbar": {
+    "mission": "Mission",
+    "community": "Community",
+    "contribute": "Contribuisci"
+  },
   "Auth": {
+    "login": "Accedi",
     "loading": "Accesso al terminale in corso...",
     "back_home": "Torna alla Home",
     "welcome_title": "Benvenuto nel ",

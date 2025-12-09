@@ -9,7 +9,11 @@ export const routing = defineRouting({
   defaultLocale: 'it',
   
   // Opzionale: prefisso sempre visibile (es. /it/...)
-  localePrefix: 'always' 
+  localePrefix: 'always',
+
+  // Se vogliamo usare la feature che apre la pagina in base alla
+  //lingua  eliminiamo questa riga
+  localeDetection: false
 });
  
 // Wrapper leggeri attorno alle API di navigazione di Next.js

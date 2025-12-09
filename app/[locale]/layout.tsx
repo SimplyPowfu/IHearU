@@ -8,7 +8,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // i18n imports
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server'; // Aggiunto getTranslations
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 
@@ -51,6 +51,7 @@ export default async function LocaleLayout({
     notFound();
   }
 
+  const t = await getTranslations('Navbar');
   const messages = await getMessages();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -88,29 +89,29 @@ export default async function LocaleLayout({
                   </span>
                 </Link>
 
-                {/* SWITCH LINGUA (SPOSTATO QUI) */}
-                <div className="hidden sm:block"> {/* Opzionale: hidden su mobile piccolissimi se serve spazio */}
+                {/* SWITCH LINGUA */}
+                <div className="hidden sm:block">
                   <LanguageSwitcher />
                 </div>
               </div>
 
-              {/* CENTRO: MENU DESKTOP */}
+              {/* CENTRO: MENU DESKTOP (TRADOTTO) */}
               <div className="hidden md:flex gap-8 text-sm font-medium text-gray-300 font-sans absolute left-1/2 transform -translate-x-1/2">
                 <Link href="/progetto" className="hover:text-neon-cyan hover:drop-shadow-[0_0_5px_rgba(5,217,232,0.8)] transition-all">
-                  Mission
+                  {t('mission')}
                 </Link>
                 <Link href="/community" className="hover:text-neon-yellow hover:drop-shadow-[0_0_5px_rgba(255,195,0,0.8)] transition-all">
-                  Community
+                  {t('community')}
                 </Link>
               </div>
 
-              {/* DESTRA: AZIONI (Contribuisci + Auth) */}
+              {/* DESTRA: AZIONI (Contribuisci TRADOTTO + Auth) */}
               <div className="flex items-center gap-4">
                 <Link 
                   href="/contribuisci" 
                   className="hidden md:block text-sm font-bold font-display text-neon-pink border border-neon-pink/30 px-4 py-2 rounded-full hover:bg-neon-pink/10 hover:border-neon-pink transition-all shadow-[0_0_10px_rgba(255,42,109,0.1)] hover:shadow-[0_0_20px_rgba(255,42,109,0.3)]"
                 >
-                  Contribuisci
+                  {t('contribute')}
                 </Link>
                 
                 <AuthButton session={user} />
