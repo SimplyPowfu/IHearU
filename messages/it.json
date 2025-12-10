@@ -32,6 +32,7 @@
   },
   "Auth": {
     "login": "Accedi",
+    "logout": "Esci",
     "loading": "Accesso al terminale in corso...",
     "back_home": "Torna alla Home",
     "welcome_title": "Benvenuto nel ",
@@ -54,6 +55,12 @@
       "register_button_label": "Registrati Ora",
       "confirmation_text": "📧 Controlla la tua posta! Clicca il link per entrare automaticamente."
       
+    },
+    "modal": {
+      "title": "Vuoi uscire?",
+      "desc": "Verrai disconnesso dal tuo account.",
+      "cancel": "Annulla",
+      "confirm": "Sì, esci"
     }
   },
   "Contribute": {
@@ -105,7 +112,7 @@
     },
     "submit": {
       "loading": "Caricamento in corso...",
-      "button": "Invia {{count}} Contributi",
+      "button": "Invia Contributi",
       "button_single": "Invia Contributo"
     },
     "alerts": {
@@ -113,7 +120,7 @@
       "empty_queue": "La lista dei video è vuota! Carica o registra almeno un video.",
       "accept_terms": "Devi accettare l'uso dei dati.",
       "login_error": "Utente non loggato",
-      "success": "{{count}} video inviati con successo! Grazie.",
+      "success": "video inviati con successo! Grazie.",
       "upload_error": "Nessun video è stato caricato correttamente.",
       "generic_error": "Errore: "
     }

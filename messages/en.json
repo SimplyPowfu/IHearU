@@ -32,6 +32,7 @@
   },
   "Auth": {
     "login": "Login",
+    "logout": "Logout",
     "loading": "Accessing terminal...",
     "back_home": "Back to Home",
     "welcome_title": "Welcome to the ",
@@ -53,6 +54,12 @@
       "social_provider_text": "Sign in with Google",
       "register_button_label": "Sign Up Now",
       "confirmation_text": "📧 Check your email! Click the link to enter automatically."
+    },
+    "modal": {
+      "title": "Logging out?",
+      "desc": "You will be disconnected from your account.",
+      "cancel": "Cancel",
+      "confirm": "Yes, sign out"
     }
   },
   "Contribute": {
@@ -104,7 +111,7 @@
     },
     "submit": {
       "loading": "Uploading...",
-      "button": "Send {{count}} Contributions",
+      "button": "Send Contributions",
       "button_single": "Send Contribution"
     },
     "alerts": {
@@ -112,7 +119,7 @@
       "empty_queue": "The video list is empty! Upload or record at least one video.",
       "accept_terms": "You must accept data usage.",
       "login_error": "User not logged in",
-      "success": "{{count}} videos sent successfully! Thank you.",
+      "success": "videos sent successfully! Thank you.",
       "upload_error": "No videos were uploaded correctly.",
       "generic_error": "Error: "
     }

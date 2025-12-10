@@ -4,12 +4,12 @@ import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 import { LogOut, User, AlertTriangle, X } from 'lucide-react'
 import { User as SupabaseUser } from '@supabase/supabase-js'
-import { Link, useRouter } from '@/i18n/routing' // Usa il Link che mantiene la lingua
-import { useTranslations } from 'next-intl'       // Hook per le traduzioni
+import { Link, useRouter } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
 
 export default function AuthButton({ session }: { session: SupabaseUser | null }) {
-  const t = useTranslations('Auth'); // Inizializza hook traduzioni
-  const router = useRouter();        // Router localizzato
+  const t = useTranslations('Auth');
+  const router = useRouter();
   const supabase = createClient()
   
   const [user, setUser] = useState<SupabaseUser | null>(session)
@@ -21,8 +21,9 @@ export default function AuthButton({ session }: { session: SupabaseUser | null }
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
-      if (event === 'SIGNED_IN') {
-        setUser(newSession?.user ?? null)
+      setUser(newSession?.user ?? null)
+      
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         router.refresh()
       }
     })
@@ -31,6 +32,7 @@ export default function AuthButton({ session }: { session: SupabaseUser | null }
 
   const confirmLogout = async () => {
     setShowModal(false)
+    setUser(null) 
     await supabase.auth.signOut()
     router.refresh()
     router.replace('/');
@@ -51,7 +53,7 @@ export default function AuthButton({ session }: { session: SupabaseUser | null }
           
           <button 
             onClick={() => setShowModal(true)}
-            title={t('logout')} // Tooltip tradotto
+            title={t('logout')} // Ora questo funzionerà perché hai aggiunto la chiave nel JSON
             className="w-10 h-10 rounded-full bg-red-600 hover:bg-red-500 flex items-center justify-center text-white transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] hover:scale-110 hover:shadow-[0_0_25px_rgba(220,38,38,0.8)]"
           >
             <LogOut className="w-5 h-5 ml-0.5" />
@@ -61,21 +63,16 @@ export default function AuthButton({ session }: { session: SupabaseUser | null }
         {/* --- POPUP MODALE --- */}
         {showModal && (
           <div className="fixed inset-0 z-[99999] h-screen w-screen flex items-center justify-center px-4 overflow-hidden">
-            
-            {/* BACKDROP */}
             <div 
               className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
               onClick={() => setShowModal(false)}
             />
 
-            {/* CARD */}
             <div className="relative bg-surface border border-white/10 rounded-2xl shadow-2xl p-8 w-full max-w-sm z-10 animate-in zoom-in-95 duration-200">
-              
               <div className="flex flex-col items-center text-center mb-8">
                 <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-4 border border-red-500/20">
                   <AlertTriangle className="w-8 h-8 text-red-500" />
                 </div>
-                {/* TESTI DEL MODALE TRADOTTI */}
                 <h3 className="text-2xl font-bold text-white font-display mb-2">{t('modal.title')}</h3>
                 <p className="text-gray-400 font-sans">
                   {t('modal.desc')}
@@ -103,7 +100,6 @@ export default function AuthButton({ session }: { session: SupabaseUser | null }
               >
                 <X className="w-5 h-5" />
               </button>
-
             </div>
           </div>
         )}
@@ -111,6 +107,7 @@ export default function AuthButton({ session }: { session: SupabaseUser | null }
     )
   }
 
+  // 2. SE ANONIMO
   return (
     <Link 
       href="/login" 
