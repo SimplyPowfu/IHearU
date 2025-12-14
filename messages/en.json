@@ -181,5 +181,10 @@
       "desc": "You don't need to be a tech expert. Just knowing a sign and sharing it is enough.",
       "button": "Contribute to Dataset"
     }
+  },
+  "Policy": {
+    "title": "Data & AI Policy",
+    "close": "Close",
+    "content": "<p>Your privacy is fundamental to the IHearU project. Here is how we manage your data transparently:</p><sep></sep><title>1. What we collect</title><p>We collect your email address (for authentication) and the <strong>videos you voluntarily upload</strong>. From the videos, we extract biometric data (key points of hands and face) necessary for movement analysis.</p><sep></sep><title>2. How we use data (AI Training)</title><p>Videos and extracted data are used <strong>exclusively</strong> to train and improve IHearU's Artificial Intelligence models, and immediately deleted afterwards. We do not sell your data to third parties for advertising purposes.</p><sep></sep><title>3. Storage and Security</title><p>Data is stored on secure servers. We use standard encryption to protect your information.</p><sep></sep><title>4. Your Rights</title><p>You can request the deletion of your account and associated videos at any time by sending a request to the team.</p><sep></sep><small>Last update: December 2025</small>"
   }
 }

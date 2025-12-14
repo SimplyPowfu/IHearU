@@ -182,5 +182,10 @@
       "desc": "Non serve essere esperti di tecnologia. Basta conoscere un segno e condividerlo.",
       "button": "Contribuisci al Dataset"
     }
+  },
+  "Policy": {
+    "title": "Informativa Dati & IA",
+    "close": "Chiudi",
+    "content": "<p>La tua privacy è fondamentale per il progetto IHearU. Ecco come gestiamo i tuoi dati in modo trasparente:</p><sep></sep><title>1. Cosa raccogliamo</title><p>Raccogliamo il tuo indirizzo email (per l'autenticazione) e i <strong>video che carichi volontariamente</strong>. Dai video estraiamo dati biometrici (punti chiave delle mani e del viso) necessari per l'analisi del movimento.</p><sep></sep><title>2. Come usiamo i dati (AI Training)</title><p>I video e i dati estratti vengono utilizzati <strong>esclusivamente</strong> per addestrare e migliorare i modelli di Intelligenza Artificiale di IHearU, e subito dopo eliminati. Non vendiamo i tuoi dati a terze parti per scopi pubblicitari.</p><sep></sep><title>3. Archiviazione e Sicurezza</title><p>I dati sono salvati su server sicuri. Utilizziamo crittografia standard per proteggere le tue informazioni.</p><sep></sep><title>4. I tuoi diritti</title><p>Puoi richiedere in qualsiasi momento la cancellazione del tuo account e dei video associati inviando una richiesta al team.</p><sep></sep><small>Ultimo aggiornamento: Dicembre 2025</small>"
   }
 }
