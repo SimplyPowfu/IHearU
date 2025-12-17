@@ -67,5 +67,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/(it|en)/:path*', '/((?!_next|_vercel|.*\\..*).*)']
+  matcher: ['/', '/(it|en)/:path*', '/((?!api|_next|_vercel|.*\\..*|auth).*)']
 };
