@@ -1,10 +1,20 @@
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { ArrowLeft, Cpu, Eye, Zap, Network, Database, Fingerprint } from 'lucide-react';
-
-// I18N IMPORTS
+import { ArrowLeft, Cpu, Eye, Network, Database, Fingerprint } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { getTranslations } from 'next-intl/server';
+import { Metadata } from 'next';
+
+// 1. SEO METADATA
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({locale, namespace: 'Project.header'});
+  
+  return {
+    title: `IHearU | ${t('title_highlight')}`,
+    description: t('subtitle').substring(0, 160),
+  };
+}
 
 export default async function ProgettoPage() {
   const t = await getTranslations('Project');
@@ -12,9 +22,11 @@ export default async function ProgettoPage() {
   return (
     <main className="min-h-screen bg-background text-white py-20 px-6 relative overflow-hidden">
       
-      {/* SFONDO CIANO/BLU SOFFUSO */}
+      {/* 2. SFONDO STATICO (I tuoi colori esatti, ma senza animazioni) */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-neon-cyan/10 rounded-full blur-[128px] animate-pulse-slow" />
+        {/* Ciano in alto a destra - Statico */}
+        <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-neon-cyan/10 rounded-full blur-[128px]" />
+        {/* Primary in basso a sinistra - Statico */}
         <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[128px]" />
       </div>
 
@@ -56,13 +68,12 @@ export default async function ProgettoPage() {
               <div>
                 <h2 className="text-3xl font-bold mb-4 font-display text-white">{t('core.title')}</h2>
                 <p className="text-gray-300 mb-6 leading-relaxed">
-                {/* RICH TEXT RENDERING */}
-                {t.rich('core.description', {
-                  bold: (chunks) => <strong className="text-neon-cyan">{chunks}</strong>,
-                  // Quando trovi <p>...</p>, inserisci due <br> prima del contenuto
-                  p: (chunks) => <><br/><br/>{chunks}</>
-                })}
-              </p>
+                  {/* MANTENUTO: Rich text con i tuoi <br/> espliciti */}
+                  {t.rich('core.description', {
+                    bold: (chunks) => <strong className="text-neon-cyan">{chunks}</strong>,
+                    p: (chunks) => <><br/><br/>{chunks}</>
+                  })}
+                </p>
                 <ul className="space-y-3 text-gray-400">
                   <li className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-neon-cyan rounded-full shadow-[0_0_10px_#05D9E8]"></div>

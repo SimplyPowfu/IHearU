@@ -7,7 +7,6 @@ import { User as SupabaseUser } from '@supabase/supabase-js'
 import { Link, useRouter } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
 
-// Rimuoviamo la prop 'session' perché il layout non la passa più
 export default function AuthButton() {
   const t = useTranslations('Auth');
   const router = useRouter();
@@ -18,7 +17,7 @@ export default function AuthButton() {
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
-    // 1. Check iniziale (veloce lato client)
+    // 1. Recupero utente lato client (Non blocca il sito)
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
@@ -26,7 +25,7 @@ export default function AuthButton() {
     }
     getUser()
 
-    // 2. Ascoltatore eventi
+    // 2. Ascolto Login/Logout in tempo reale
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       setUser(newSession?.user ?? null)
       setLoading(false)
@@ -39,13 +38,13 @@ export default function AuthButton() {
 
   const confirmLogout = async () => {
     setShowModal(false)
-    setUser(null)
+    setUser(null) // Feedback istantaneo
     await supabase.auth.signOut()
     router.refresh()
     router.replace('/');
   }
 
-  // Mentre carica, mostriamo uno scheletro o il bottone di login (per evitare salti)
+  // Mentre carica, mostriamo uno scheletro vuoto per evitare salti grafici
   if (loading) {
     return <div className="w-24 h-9 bg-white/5 rounded-full animate-pulse" />
   }
@@ -71,7 +70,7 @@ export default function AuthButton() {
           </button>
         </div>
 
-        {/* MODALE (Codice identico a prima, ometto per brevità ma va qui) */}
+        {/* MODALE LOGOUT */}
         {showModal && (
           <div className="fixed inset-0 z-[99999] h-screen w-screen flex items-center justify-center px-4 overflow-hidden">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowModal(false)} />
